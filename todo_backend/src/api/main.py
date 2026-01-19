@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Path, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -208,6 +208,7 @@ def update_task(
 @app.delete(
     "/tasks/{task_id}",
     status_code=204,
+    response_class=Response,
     tags=["Tasks"],
     summary="Delete task",
     description="Deletes a task by id.",
@@ -216,18 +217,18 @@ def update_task(
 # PUBLIC_INTERFACE
 def delete_task(
     task_id: int = Path(..., ge=1, description="Task id"),
-) -> None:
+) -> Response:
     """Delete a task by id.
 
     Args:
         task_id: The task id.
 
     Returns:
-        None (204 No Content).
+        An empty 204 No Content response.
 
     Raises:
         HTTPException: 404 if not found.
     """
     _get_task_or_404(task_id)
     del _TASKS[task_id]
-    return None
+    return Response(status_code=204)
